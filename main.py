@@ -1,16 +1,26 @@
-# This is a sample Python script.
+import sys
+from PyQt5.QtWidgets import QApplication, QMainWindow
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+from dashboard.dashboard import Dashboard
 
 
-# Press the green button in the gutter to run the script.
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        # Sample data for initialization
+        data = {'counterparties': ['Counterparty 1', 'Counterparty 2', 'Counterparty 3']}
+
+        # Create the Dashboard instance
+        self.dashboard = Dashboard(data)
+
+        # Set up the main window
+        self.setWindowTitle("Dashboard Demo")
+        self.setCentralWidget(self.dashboard)
+        self.setGeometry(100, 100, 800, 600)
+
 if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    app = QApplication(sys.argv)
+    main_window = MainWindow()
+    main_window.show()
+    sys.exit(app.exec_())
