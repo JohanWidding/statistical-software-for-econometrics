@@ -1,10 +1,10 @@
-# Project Name
+# Statistical software for timeserial-econometrics
 
-Brief description or tagline for your project.
+This repository utilize Python, PyQt5, and various statistical libraries to facilitate robust analysis and interpretation of time-series data. The primary focus is on econometric techniques applied to time-dependent datasets, allowing users to gain valuable insights into economic phenomena.
 
 ## Table of Contents
 
-- [Project Name](#project-name)
+- [Statistical software for timeserial-econometrics](#project-name)
   - [Table of Contents](#table-of-contents)
   - [Description](#description)
   - [Features](#features)
@@ -14,6 +14,11 @@ Brief description or tagline for your project.
   - [License](#license)
   - [Acknowledgements](#acknowledgements)
 
+## Installation
+
+Provide step-by-step instructions on how to install and set up your project. Include any dependencies or system requirements.
+
+
 ## Description
 
 A concise paragraph explaining what your project does.
@@ -22,9 +27,6 @@ A concise paragraph explaining what your project does.
 
 - List key features or functionalities of your project.
 
-## Installation
-
-Provide step-by-step instructions on how to install and set up your project. Include any dependencies or system requirements.
 
 ```bash
 # Example command to install dependencies
