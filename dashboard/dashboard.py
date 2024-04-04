@@ -11,12 +11,12 @@ from widgets.drop_file_area import DropArea
 class Dashboard(QWidget):
     data_signal = pyqtSignal(dict)  # Define a signal to send data to the parent
 
-    def __init__(self, data):
+    def __init__(self):
         super().__init__()
-        self.data = data
         layout = QGridLayout()
 
         drop_area = DropArea()
+        drop_area.setFixedWidth(200)
 
         label = QLabel('Analytical tools')
         label.setFont(QFont("Arial", 14))
@@ -25,10 +25,10 @@ class Dashboard(QWidget):
         self.search_input.returnPressed.connect(self.handle_search)
         search_button.clicked.connect(self.handle_search)
 
-        self.search_input.setFixedWidth(300)
+        self.search_input.setFixedWidth(200)
         self.search_input.setFixedHeight(50)
         self.search_input.setFont(QFont("Arial", 20))
-        search_button.setFixedWidth(300)
+        search_button.setFixedWidth(200)
 
         self.result_label = QLabel('Results:')
         self.result_display = QWidget()  # Container for scrollable results
@@ -40,7 +40,7 @@ class Dashboard(QWidget):
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
         scroll_area.setWidget(self.result_display)
-        scroll_area.setFixedWidth(300)
+        scroll_area.setFixedWidth(200)
         self.updateScrollArea(".\\pages", "")
 
 
@@ -92,4 +92,5 @@ class Dashboard(QWidget):
 
     def details_button_click(self, info):
         self.additional_box.update_data(info)
+        print(info)
 

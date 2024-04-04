@@ -8,11 +8,8 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        # Sample data for initialization
-        data = {'counterparties': ['Counterparty 1', 'Counterparty 2', 'Counterparty 3']}
-
         # Create the Dashboard instance
-        self.dashboard = Dashboard(data)
+        self.dashboard = Dashboard()
 
         # Set up the main window
         self.setWindowTitle("Dashboard Demo")
