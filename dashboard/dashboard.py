@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QLabel, QWidget, QPushButton, QGridLayo
 from PyQt5.QtCore import Qt
 
 from dashboard.show_selection_widget import ShowSelectionWidget
+from widgets.drop_file_area import DropArea
 
 
 class Dashboard(QWidget):
@@ -14,6 +15,8 @@ class Dashboard(QWidget):
         super().__init__()
         self.data = data
         layout = QGridLayout()
+
+        drop_area = DropArea()
 
         label = QLabel('Analytical tools')
         label.setFont(QFont("Arial", 14))
@@ -44,13 +47,13 @@ class Dashboard(QWidget):
         # Create a new widget for the additional box
         self.additional_box = ShowSelectionWidget()
 
-
-        layout.addWidget(label, 0, 0)
-        layout.addWidget(self.search_input, 1, 0)
-        layout.addWidget(search_button, 2, 0)
-        layout.addWidget(self.result_label, 3, 0)
-        layout.addWidget(scroll_area, 4, 0)
-        layout.addWidget(self.additional_box, 0, 1, 5, 2)
+        layout.addWidget(drop_area, 0, 0, 3, 1)
+        layout.addWidget(label, 0, 1)
+        layout.addWidget(self.search_input, 1, 1)
+        layout.addWidget(search_button, 2, 1)
+        layout.addWidget(self.result_label, 3, 1)
+        layout.addWidget(scroll_area, 4, 1)
+        layout.addWidget(self.additional_box, 0, 2, 5, 2)
 
         self.setLayout(layout)
 
