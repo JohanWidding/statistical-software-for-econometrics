@@ -41,3 +41,14 @@ class ToggleByMultipleOptionsButton(QWidget):
 
     def get_current_option(self):
         return self.current_option
+
+    def set_state(self, option):
+        """
+        Set the state of the button group to the specified option.
+        """
+        for button in self.buttons:
+            if button.text() == option:
+                button.setChecked(True)
+                self.current_option = option
+                self.stateChanged.emit(option)
+                break

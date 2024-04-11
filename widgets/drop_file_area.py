@@ -56,9 +56,19 @@ class DropArea(QWidget):
                 if file_extension == "dta":
                     df = pd.read_stata(file_path)
                 elif file_extension == "csv":
-                    df = pd.read_csv(file_path)
+                    # First try to read CSV file with UTF-8 encoding
+                    try:
+                        df = pd.read_csv(file_path, encoding="utf-8")
+                    except UnicodeDecodeError:
+                        # If UTF-8 fails, try "windows-1252" encoding
+                        df = pd.read_csv(file_path, encoding="windows-1252")
                 elif file_extension in ["xls", "xlsx"]:
-                    df = pd.read_excel(file_path)
+                    # First try to read Excel file with UTF-8 encoding
+                    try:
+                        df = pd.read_excel(file_path, encoding="utf-8")
+                    except UnicodeDecodeError:
+                        # If UTF-8 fails, try "windows-1252" encoding
+                        df = pd.read_excel(file_path, encoding="windows-1252")
                 else:
                     # Unsupported file type
                     QMessageBox.warning(self, "Unsupported File", "This file format is not supported.")

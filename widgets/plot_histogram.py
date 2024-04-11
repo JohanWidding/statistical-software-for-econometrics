@@ -46,13 +46,13 @@ class PlotHistogram(QWidget):
         # Set the background color using CSS
         self.setStyleSheet("background-color: none;")
 
-    def updateData(self, data, column_name, title="", xlabel="", ylabel="", color="b"):
+    def updateData(self, data, column_name, title="", xlabel="", ylabel=""):
 
 
         self.canvas.axes.clear()  # Clear the previous plot
 
         # Plot histogram
-        self.canvas.axes.hist(data[column_name], color=color)
+        self.canvas.axes.hist(data[column_name])
 
         # Set the title, labels, and redraw the canvas
         self.canvas.axes.set_title(title)

@@ -2,11 +2,12 @@ import numpy as np
 import pandas as pd
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QVBoxLayout, QLabel, QWidget, QGridLayout, QScrollArea, QPushButton, QComboBox, QSlider, \
-    QHBoxLayout, QFrame, QMessageBox
+    QHBoxLayout, QFrame, QMessageBox, QSizePolicy
 
 from functions.apply_transformation import apply_transformation
 from functions.group_by_method import group_by_method
 from widgets.plot_histogram import PlotHistogram
+from widgets.plot_threeway import PlotThreeWay
 from widgets.plot_twoway import PlotTwoWay
 from widgets.toggle_by_multilple_options_button import ToggleByMultipleOptionsButton
 
@@ -29,6 +30,8 @@ class Page(QWidget):
         self.yvar_state = "Normal"
         self.xvar = self.df.columns[0]
         self.xvar_state = "Normal"
+        self.zvar = self.df.columns[0]
+        self.zvar_state = "Normal"
 
         # First view: QGridLayout
         self.grid_layout = QGridLayout()
@@ -43,12 +46,16 @@ class Page(QWidget):
         # Add more widgets to the scroll layout as needed
         self.populate_scroll_layout()  # You can create a method to populate the scroll layout
         self.scroll_widget = QWidget()  # Creating a widget to hold the scroll layout
+
         self.scroll_widget.setLayout(self.scroll_layout)
 
         # Main layout for the page
         self.main_layout = QVBoxLayout(self)
         self.main_layout.addWidget(self.grid_widget)
         self.main_layout.addWidget(self.scroll_widget)
+
+        # Set the size policy of the scroll area
+        self.scroll_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
     def populate_grid_layout(self):
         # Groupvar Section
@@ -131,9 +138,38 @@ class Page(QWidget):
         # Add xvar frame to grid layout
         self.grid_layout.addWidget(xvar_frame, 0, 5)
 
+        # Spacer
+        self.spacer2 = QLabel("")
+        self.grid_layout.addWidget(self.spacer2, 0, 6)
+
+        # Zvar Section
+        # ------------
+        zvar_frame = QFrame()
+        zvar_frame.setFrameStyle(QFrame.Box | QFrame.Plain)
+        zvar_layout = QVBoxLayout()
+        zvar_frame.setLayout(zvar_layout)
+
+        self.dropdown_zvar_label = QLabel("Select z-axis var:")
+        zvar_layout.addWidget(self.dropdown_zvar_label)
+
+        self.dropdown_zvar = QComboBox()
+        self.dropdown_zvar.addItems(self.df.columns)
+        self.dropdown_zvar.setCurrentText(self.zvar)
+        zvar_layout.addWidget(self.dropdown_zvar)
+
+        self.zvar_mode = ToggleByMultipleOptionsButton(
+            ["Normal", "ln(x)", "x^2", "√x", "\n", "∛x", "e^x", "1/x", "arcsin(√x)", "x -> rank(x)"])
+        self.zvar_mode.set_state(self.zvar_state)
+        self.zvar_mode.stateChanged.connect(self.update_state_zvar)
+        zvar_layout.addWidget(self.zvar_mode)
+
+        # Add zvar frame to grid layout
+        self.grid_layout.addWidget(zvar_frame, 0, 7)
+
         self.dropdown_group.currentIndexChanged.connect(self.update_data_to_show)
         self.dropdown_yvar.currentIndexChanged.connect(self.update_data_to_show)
         self.dropdown_xvar.currentIndexChanged.connect(self.update_data_to_show)
+        self.dropdown_zvar.currentIndexChanged.connect(self.update_data_to_show)
 
     def update_labels(self):
         value = self.slider.value()
@@ -150,18 +186,18 @@ class Page(QWidget):
         # Create a layout for the histograms frame
         histograms_layout = QHBoxLayout(histograms_frame)
         histograms_frame.setLayout(histograms_layout)
+        # Set stretch factor for the histograms frame to make it expand
+        histograms_layout.setStretchFactor(histograms_frame, 1)
 
-        self.yvar_histogram = PlotHistogram()
-        self.xvar_histogram = PlotHistogram()
-        self.twoway = PlotTwoWay()
+        self.threeway = PlotThreeWay()
+
 
         # Add the histograms to the histograms layout
-        histograms_layout.addWidget(self.yvar_histogram)
-        histograms_layout.addWidget(self.xvar_histogram)
+        histograms_layout.addWidget(self.threeway)
 
         # Add the grid layout to the scroll layout
         self.scroll_layout.addWidget(histograms_frame)
-        self.scroll_layout.addWidget(self.twoway)
+
 
         # Add widgets to the scroll layout
         pass  # Placeholder, replace with actual code
@@ -170,17 +206,19 @@ class Page(QWidget):
 
 
         # Selecting three headers/columns from the original DataFrame
-        selected_columns = [self.dropdown_group.currentText(), self.dropdown_yvar.currentText(), self.dropdown_xvar.currentText()]
+        selected_columns = [self.dropdown_group.currentText(), self.dropdown_xvar.currentText(), self.dropdown_yvar.currentText(), self.dropdown_zvar.currentText()]
 
         # Creating a sub DataFrame with only the selected columns
         sub_df = self.df[selected_columns].copy()
 
-        # Check if the name at the 0th position is different from the names at 1st and 2nd positions
-        if not (selected_columns[0] != selected_columns[1] and selected_columns[0] != selected_columns[2]):
+        # Check if the name at the 0th position is different from the names at the 1st, 2nd, and 3rd positions
+        if not (selected_columns[0] != selected_columns[1] and selected_columns[0] != selected_columns[2] and
+                selected_columns[0] != selected_columns[3]):
             return
 
-        sub_df = apply_transformation(sub_df, selected_columns[1], self.yvar_state)
-        sub_df = apply_transformation(sub_df, selected_columns[2], self.xvar_state)
+        sub_df = apply_transformation(sub_df, selected_columns[1], self.xvar_state)
+        sub_df = apply_transformation(sub_df, selected_columns[2], self.yvar_state)
+        sub_df = apply_transformation(sub_df, selected_columns[3], self.zvar_state)
         sub_df = group_by_method(sub_df, selected_columns[0], self.group_state)
 
         # Check if sub_df is None
@@ -193,12 +231,7 @@ class Page(QWidget):
             QMessageBox.warning(self, "Error", "Data contains infinite values.")
             return
 
-        self.yvar_histogram.updateData(sub_df, selected_columns[1])
-        self.xvar_histogram.updateData(sub_df, selected_columns[2])
-        self.twoway.y_ax_name = selected_columns[1]
-        self.twoway.x_ax_name = selected_columns[2]
-        self.twoway.updateData(sub_df)
-
+        self.threeway.updateData(sub_df, x_ax_name=selected_columns[1], y_ax_name=selected_columns[2], z_ax_name=selected_columns[3])
 
 
 
@@ -212,4 +245,8 @@ class Page(QWidget):
 
     def update_state_yvar(self, state):
         self.yvar_state = state
+        self.update_data_to_show()
+
+    def update_state_zvar(self, state):
+        self.zvar_state = state
         self.update_data_to_show()

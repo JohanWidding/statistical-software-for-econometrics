@@ -2,6 +2,7 @@ import pandas as pd
 
 
 def group_by_method(df, column, method):
+
     if method == "Mean":
         # Group by the specified column and calculate the mean of each group
         grouped_df = df.groupby(column).mean()
@@ -19,6 +20,6 @@ def group_by_method(df, column, method):
         grouped_df = df.groupby(column).last()
     else:
         # If an invalid method is provided, return None
-        return None
+        return df
 
     return grouped_df
