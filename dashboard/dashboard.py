@@ -1,7 +1,7 @@
 import os
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QVBoxLayout, QLabel, QWidget, QPushButton, QGridLayout, QLineEdit, QScrollArea
+from PyQt5.QtWidgets import QVBoxLayout, QLabel, QWidget, QPushButton, QGridLayout, QLineEdit, QScrollArea, QSizePolicy
 from PyQt5.QtCore import Qt
 
 from dashboard.show_selection_widget import ShowSelectionWidget
@@ -16,7 +16,9 @@ class Dashboard(QWidget):
         layout = QGridLayout()
 
         drop_area = DropArea()
-        drop_area.setFixedWidth(200)
+        drop_area.setFixedWidth(400)
+        drop_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
 
         label = QLabel('Analytical tools')
         label.setFont(QFont("Arial", 14))
@@ -25,10 +27,10 @@ class Dashboard(QWidget):
         self.search_input.returnPressed.connect(self.handle_search)
         search_button.clicked.connect(self.handle_search)
 
-        self.search_input.setFixedWidth(200)
+        self.search_input.setFixedWidth(400)
         self.search_input.setFixedHeight(50)
         self.search_input.setFont(QFont("Arial", 20))
-        search_button.setFixedWidth(200)
+        search_button.setFixedWidth(400)
 
         self.result_label = QLabel('Results:')
         self.result_display = QWidget()  # Container for scrollable results
@@ -40,14 +42,14 @@ class Dashboard(QWidget):
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
         scroll_area.setWidget(self.result_display)
-        scroll_area.setFixedWidth(200)
+        scroll_area.setFixedWidth(400)
         self.updateScrollArea(".\\pages", "")
 
 
         # Create a new widget for the additional box
         self.additional_box = ShowSelectionWidget()
 
-        layout.addWidget(drop_area, 0, 0, 3, 1)
+        layout.addWidget(drop_area, 0, 0, 5, 1)
         layout.addWidget(label, 0, 1)
         layout.addWidget(self.search_input, 1, 1)
         layout.addWidget(search_button, 2, 1)
@@ -86,7 +88,7 @@ class Dashboard(QWidget):
         # Create buttons based on sub-folders
         for subfolder in subfolders:
             button = QPushButton(subfolder.replace("_", " ").capitalize())
-            button.setStyleSheet("text-align: left;")
+            button.setStyleSheet("text-align: left; font-size: 12pt;")
             button.clicked.connect(lambda checked, folder=subfolder: self.details_button_click(folder))
             self.result_layout.addWidget(button)
 

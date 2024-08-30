@@ -2,29 +2,15 @@ import numpy as np
 import pandas as pd
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QVBoxLayout, QLabel, QWidget, QGridLayout, QScrollArea, QPushButton, QComboBox, QSlider, \
-    QHBoxLayout, QFrame, QMessageBox, QSizePolicy, QFormLayout
-from PyQt5.uic.properties import QtWidgets
-from matplotlib import cm
+    QHBoxLayout, QFrame, QMessageBox, QFormLayout
 
 from functions.apply_transformation import apply_transformation
 from functions.group_by_method import group_by_method
-from functions.logistic_regression_surface_xyz import logistic_regression_surface
 from widgets.plot_histogram import PlotHistogram
-from widgets.plot_surface import PlotSurface
-from widgets.plot_threeway import PlotThreeWay
+from widgets.plot_ridgeline import PlotRidgeline
 from widgets.plot_twoway import PlotTwoWay
 from widgets.toggle_by_multilple_options_button import ToggleByMultipleOptionsButton
 
-class Window(QScrollArea):
-    def __init__(self):
-        super(Window, self).__init__()
-        widget = QWidget()
-        layout = QVBoxLayout(widget)
-        layout.setAlignment(Qt.AlignTop)
-        for index in range(100):
-            layout.addWidget(QLabel('Label %02d' % index))
-        self.setWidget(widget)
-        self.setWidgetResizable(True)
 
 class Page(QWidget):
 
@@ -44,8 +30,6 @@ class Page(QWidget):
         self.yvar_state = "Normal"
         self.xvar = self.df.columns[0]
         self.xvar_state = "Normal"
-        self.zvar = self.df.columns[0]
-        self.zvar_state = "Normal"
 
         # First view: QGridLayout
         self.grid_layout = QGridLayout()
@@ -53,7 +37,6 @@ class Page(QWidget):
         self.populate_grid_layout()  # You can create a method to populate the grid layout
         self.grid_widget = QWidget()  # Creating a widget to hold the grid layout
         self.grid_widget.setLayout(self.grid_layout)
-        self.grid_widget.setFixedHeight(200)
 
         # Frame to contain the scrollable results
         frame = QFrame()
@@ -76,14 +59,12 @@ class Page(QWidget):
         frame_layout.addWidget(self.scroll_area)
 
         # Add more widgets to the scroll layout as needed
-         # You can create a method to populate the scroll layout
-
+        # You can create a method to populate the scroll layout
 
         # Main layout for the page
         self.main_layout = QVBoxLayout(self)
         self.main_layout.addWidget(self.grid_widget)
         self.main_layout.addWidget(frame)  # Add the scroll area to the main layout
-
 
     def populate_grid_layout(self):
         # Groupvar Section
@@ -101,11 +82,6 @@ class Page(QWidget):
         self.dropdown_group.setCurrentText(self.groupvar)
         group_layout.addWidget(self.dropdown_group)
 
-        self.group_mode = ToggleByMultipleOptionsButton(
-            ["Mean", "Median", "Mode", "\n", "First variable", "Last variable"])
-        self.group_mode.set_state(self.group_state)
-        self.group_mode.stateChanged.connect(self.update_state_group)
-        group_layout.addWidget(self.group_mode)
 
         # Add group frame to grid layout
         self.grid_layout.addWidget(group_frame, 0, 0)
@@ -121,19 +97,13 @@ class Page(QWidget):
         yvar_layout = QVBoxLayout()
         yvar_frame.setLayout(yvar_layout)
 
-        self.dropdown_yvar_label = QLabel("Select y-axis var:")
+        self.dropdown_yvar_label = QLabel("Select time variable:")
         yvar_layout.addWidget(self.dropdown_yvar_label)
 
         self.dropdown_yvar = QComboBox()
         self.dropdown_yvar.addItems(self.df.columns)
         self.dropdown_yvar.setCurrentText(self.yvar)
         yvar_layout.addWidget(self.dropdown_yvar)
-
-        self.yvar_mode = ToggleByMultipleOptionsButton(
-            ["Normal", "ln(x)", "x^2", "√x", "\n", "∛x", "e^x", "1/x", "arcsin(√x)", "x -> rank(x)"])
-        self.yvar_mode.set_state(self.yvar_state)
-        self.yvar_mode.stateChanged.connect(self.update_state_yvar)
-        yvar_layout.addWidget(self.yvar_mode)
 
 
         # Add yvar frame to grid layout
@@ -150,7 +120,7 @@ class Page(QWidget):
         xvar_layout = QVBoxLayout()
         xvar_frame.setLayout(xvar_layout)
 
-        self.dropdown_xvar_label = QLabel("Select x-axis var:")
+        self.dropdown_xvar_label = QLabel("Select variable to check:")
         xvar_layout.addWidget(self.dropdown_xvar_label)
 
         self.dropdown_xvar = QComboBox()
@@ -167,38 +137,9 @@ class Page(QWidget):
         # Add xvar frame to grid layout
         self.grid_layout.addWidget(xvar_frame, 0, 5)
 
-        # Spacer
-        self.spacer2 = QLabel("")
-        self.grid_layout.addWidget(self.spacer2, 0, 6)
-
-        # Zvar Section
-        # ------------
-        zvar_frame = QFrame()
-        zvar_frame.setFrameStyle(QFrame.Box | QFrame.Plain)
-        zvar_layout = QVBoxLayout()
-        zvar_frame.setLayout(zvar_layout)
-
-        self.dropdown_zvar_label = QLabel("Select z-axis var:")
-        zvar_layout.addWidget(self.dropdown_zvar_label)
-
-        self.dropdown_zvar = QComboBox()
-        self.dropdown_zvar.addItems(self.df.columns)
-        self.dropdown_zvar.setCurrentText(self.zvar)
-        zvar_layout.addWidget(self.dropdown_zvar)
-
-        self.zvar_mode = ToggleByMultipleOptionsButton(
-            ["Normal", "ln(x)", "x^2", "√x", "\n", "∛x", "e^x", "1/x", "arcsin(√x)", "x -> rank(x)"])
-        self.zvar_mode.set_state(self.zvar_state)
-        self.zvar_mode.stateChanged.connect(self.update_state_zvar)
-        zvar_layout.addWidget(self.zvar_mode)
-
-        # Add zvar frame to grid layout
-        self.grid_layout.addWidget(zvar_frame, 0, 7)
-
         self.dropdown_group.currentIndexChanged.connect(self.update_data_to_show)
         self.dropdown_yvar.currentIndexChanged.connect(self.update_data_to_show)
         self.dropdown_xvar.currentIndexChanged.connect(self.update_data_to_show)
-        self.dropdown_zvar.currentIndexChanged.connect(self.update_data_to_show)
 
     def update_labels(self):
         value = self.slider.value()
@@ -216,58 +157,39 @@ class Page(QWidget):
         histograms_layout = QHBoxLayout(histograms_frame)
         histograms_frame.setLayout(histograms_layout)
 
-
-        self.plotsurface = PlotSurface()
-
-        self.df = self.df[self.df['Stilling_F'] <= 100]
-        self.df = self.df[self.df['Stilling_F'] >= 90]
-        self.df = self.df[self.df['PAIutdanning'] == 432]
-
-        dep = 'Lang_fravær'
-        explan = ['Ansatt_antallAAR', 'Stilling_F']
-        """
-        Det ser ut til at vi kan dele inn i grupper for utdannelsekode, dette datasettet er for hele kommunen, alle ansatte.
-        Ansvar betyr hvilken avdeling de jobber i.
-        
-        """
-        # Create data
-        #X, Y, Z = logistic_regression_surface(self.df, dep, explan)
-        X, Y, Z = logistic_regression_surface(self.df, dep, explan, time_control='t')
-        # X, Y, Z = logistic_regression_surface(self.df, dep, explan, time_control='t', entity_control='LNR', sample_percentage=0.01)
-
-        # Update the plot with the provided data
-        self.plotsurface.updateData(X, Y, Z, cmap=cm.coolwarm, linewidth=0, antialiased=False, x_title=explan[0], y_title=explan[1], main_title=f"Sansynlighet for {dep}")
-
-        self.plotsurface.setFixedHeight(500)  # Adjust the height value as needed
-
-        histograms_frame.setFixedHeight(500)
+        self.var_histogram = PlotHistogram()
 
 
         # Add the histograms to the histograms layout
-        histograms_layout.addWidget(self.plotsurface)
+        histograms_layout.addWidget(self.var_histogram)
+
+        self.var_ridgeline = PlotRidgeline()
+
+        histograms_frame.setFixedHeight(600)
+
 
         # Add the grid layout to the scroll layout
         self.scroll_layout.addWidget(histograms_frame)
 
+        self.scroll_layout.addWidget(self.var_ridgeline)
+
+        # Add widgets to the scroll layout
+        pass  # Placeholder, replace with actual code
 
     def update_data_to_show(self):
 
 
         # Selecting three headers/columns from the original DataFrame
-        selected_columns = [self.dropdown_group.currentText(), self.dropdown_xvar.currentText(), self.dropdown_yvar.currentText(), self.dropdown_zvar.currentText()]
+        selected_columns = [self.dropdown_group.currentText(), self.dropdown_yvar.currentText(), self.dropdown_xvar.currentText()]
 
         # Creating a sub DataFrame with only the selected columns
         sub_df = self.df[selected_columns].copy()
 
-        # Check if the name at the 0th position is different from the names at the 1st, 2nd, and 3rd positions
-        if not (selected_columns[0] != selected_columns[1] and selected_columns[0] != selected_columns[2] and
-                selected_columns[0] != selected_columns[3]):
+        # Check if the name at the 0th position is different from the names at 1st and 2nd positions
+        if not (selected_columns[0] != selected_columns[1] and selected_columns[0] != selected_columns[2]):
             return
 
-        sub_df = apply_transformation(sub_df, selected_columns[1], self.xvar_state)
-        sub_df = apply_transformation(sub_df, selected_columns[2], self.yvar_state)
-        sub_df = apply_transformation(sub_df, selected_columns[3], self.zvar_state)
-        sub_df = group_by_method(sub_df, selected_columns[0], self.group_state)
+        sub_df = apply_transformation(sub_df, selected_columns[2], self.xvar_state)
 
         # Check if sub_df is None
         if sub_df is None:
@@ -279,22 +201,16 @@ class Page(QWidget):
             QMessageBox.warning(self, "Error", "Data contains infinite values.")
             return
 
-        self.threeway.updateData(sub_df, x_ax_name=selected_columns[1], y_ax_name=selected_columns[2], z_ax_name=selected_columns[3])
+        self.var_histogram.updateData(sub_df, selected_columns[2])
+        self.var_ridgeline.updateData(sub_df, selected_columns[1], selected_columns[2])
+
+        new_height = 600 * len([str(cat) for cat in np.unique(sub_df[selected_columns[1]])])
+        # Set the minimum height of the frame to the new calculated height
+        self.var_ridgeline.setFixedHeight(new_height)
 
 
 
-    def update_state_group(self, state):
-        self.group_state = state
-        self.update_data_to_show()
 
     def update_state_xvar(self, state):
         self.xvar_state = state
-        self.update_data_to_show()
-
-    def update_state_yvar(self, state):
-        self.yvar_state = state
-        self.update_data_to_show()
-
-    def update_state_zvar(self, state):
-        self.zvar_state = state
         self.update_data_to_show()

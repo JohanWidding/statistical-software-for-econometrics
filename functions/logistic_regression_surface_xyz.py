@@ -10,14 +10,14 @@ def logistic_regression_surface(df, dependent_var, explanatory_vars, time_contro
     y = df[dependent_var]
     X = df[explanatory_vars]
 
-    # Create dummy variables for time control
+    # Create dummy variables for time fixed effects
     if time_control is not None:
-        dummy_time = pd.get_dummies(df[time_control], prefix='dummy', dtype=int)
+        dummy_time = pd.get_dummies(df[time_control], prefix='dummy', dtype=int, drop_first=True)
         X = pd.concat([X, dummy_time], axis=1)
 
-    # Create dummy variables for entity control
+    # Create dummy variables for entity fixed effects
     if entity_control is not None:
-        dummy_entity = pd.get_dummies(df[entity_control], prefix='dummy', dtype=int)
+        dummy_entity = pd.get_dummies(df[entity_control], prefix='dummy', dtype=int, drop_first=True)
         X = pd.concat([X, dummy_entity], axis=1)
 
     # Add constant to the explanatory variables

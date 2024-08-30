@@ -1,14 +1,14 @@
-# Statistical software for timeserial-econometrics
+# Statistical software for econometrics
 
-This repository utilize Python, PyQt5, and various statistical libraries to facilitate robust analysis and interpretation of time-series data. The primary focus is on econometric techniques applied to time-dependent datasets, allowing users to gain valuable insights into economic phenomena.
+This repository utilize Python, PyQt5, and various statistical libraries to facilitate robust analysis and interpretation of time-series data, cross sectional or and panel data. The primary focus is on econometric techniques applied to time-dependent datasets, allowing users to gain valuable insights into economic phenomena.
 
 ## Table of Contents
 
-- [Statistical software for timeserial-econometrics](#project-name)
-  - [Table of Contents](#table-of-contents)
+- [Statistical software for econometrics](#project-name)
+  - [Installation](#installation)
   - [Description](#description)
   - [Features](#features)
-  - [Installation](#installation)
+  
   - [Usage](#usage)
   - [Contributing](#contributing)
   - [License](#license)
@@ -16,18 +16,27 @@ This repository utilize Python, PyQt5, and various statistical libraries to faci
 
 ## Installation
 
-Provide step-by-step instructions on how to install and set up your project. Include any dependencies or system requirements.
+Step-by-step instructions on how to install and set up your project. 
+```bash
+# In the folder you want the project to be stored at use the following command:
+git clone https://github.com/JohanWidding/statistical-software-for-econometrics.git
 
+#Change directory
+cd statistical-software-for-econometrics
+
+# Install requirements:
+pip install requirements_dev.txt
+
+# You are done!
+```
 
 ## Description
 
-A concise paragraph explaining what your project does.
+The application gives the user a nice overview of the different statistical models that are included in the pages folder.
 
 ## Features
 
-- List key features or functionalities of your project.
+- 3D Plot
+- Dropp files of type: .dta .csv .txt .excel
+- Linear regression
 
-
-```bash
-# Example command to install dependencies
-npm install
